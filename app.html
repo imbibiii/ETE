@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#071126">
+<title>ETE | Tu tiempo, tu ritmo</title>
+
+<style>
+:root{
+  --bg:#071126;
+  --panel:#101e3c;
+  --blue:#398bff;
+  --cyan:#55d6f5;
+  --text:#eef4ff;
+  --muted:#9aacca;
+  --border:#25395e;
+  --green:#5ce0b0;
+  --red:#ff7585;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:radial-gradient(ellipse at top right,#12376a 0,transparent 42%),var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  min-height:100vh;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:2px solid var(--cyan);
+  outline-offset:2px;
+}
+.app{max-width:1250px;margin:auto;padding:22px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:48px;height:48px;border-radius:16px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--blue),#655cff);
+  font-size:23px;font-weight:bold;
+  box-shadow:0 8px 28px #247cff40;
+}
+.brand h1{font-size:22px;margin:0;letter-spacing:2px}
+.brand p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.top-chip{border:1px solid var(--border);border-radius:30px;padding:10px 14px;color:var(--cyan);font-size:12px}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px}
+.sidebar,.panel,.hero,.stat,.feature{
+  background:linear-gradient(145deg,#112141,#0c1933);
+  border:1px solid var(--border);
+  border-radius:22px;
+}
+.sidebar{padding:14px;height:max-content;position:sticky;top:16px}
+.navbtn{
+  width:100%;display:flex;align-items:center;gap:12px;text-align:left;
+  color:var(--muted);background:transparent;border:0;border-radius:13px;
+  padding:13px;margin:3px 0;
+}
+.navbtn:hover,.navbtn.active{background:#1c3763;color:white}
+.navbtn.active{box-shadow:inset 3px 0 var(--cyan)}
+.nav-icon{font-size:19px;width:24px;text-align:center}
+.side-note{margin:22px 7px 5px;color:var(--muted);font-size:12px;line-height:1.6}
+main{min-width:0}
+.page{display:none}
+.page.active{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
+.hero{padding:28px;position:relative;overflow:hidden;margin-bottom:18px}
+.hero:after{
+  content:"";position:absolute;width:190px;height:190px;border-radius:50%;
+  right:-65px;top:-85px;background:#378cff20;border:25px solid #378cff12;
+  pointer-events:none;
+}
+.eyebrow{font-size:11px;letter-spacing:2px;color:var(--cyan);text-transform:uppercase}
+h2{font-size:27px;margin:10px 0}
+p{line-height:1.6}
+.muted{color:var(--muted)}
+.hero p{max-width:520px;color:#b9c9e5;margin-bottom:20px}
+.btn{
+  background:linear-gradient(135deg,#388cff,#625cff);
+  color:white;border:0;border-radius:12px;padding:11px 16px;font-weight:bold;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn.secondary{background:#1a3156;border:1px solid #34517d}
+.btn.danger{background:#482337;border:1px solid #8c4055}
+.btn.small{padding:7px 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.stat{padding:18px}
+.stat .label{font-size:12px;color:var(--muted)}
+.stat .number{font-size:27px;font-weight:bold;margin-top:10px}
+.stat .sub{font-size:11px;color:var(--cyan);margin-top:5px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:22px 0 12px}
+.section-head h3{margin:0;font-size:17px}
+.features{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.feature{padding:18px;cursor:pointer;transition:.2s}
+.feature:hover{border-color:var(--blue);transform:translateY(-2px)}
+.feature .symbol{font-size:25px}
+.feature h3{font-size:15px;margin:12px 0 6px}
+.feature p{font-size:12px;color:var(--muted);margin:0}
+.panel{padding:22px;margin-bottom:16px}
+.panel h3{margin:0 0 16px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.field label{font-size:12px;color:var(--muted)}
+.field input,.field select,.field textarea,.searchbox{
+  width:100%;background:#09152c;border:1px solid var(--border);
+  border-radius:11px;color:var(--text);padding:12px;min-width:0;
+}
+.field textarea{resize:vertical;min-height:90px}
+.field option{background:#0b1730}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.task-list{display:grid;gap:10px;margin-top:14px}
+.task{
+  display:flex;gap:12px;align-items:flex-start;padding:15px;
+  background:#0a1730;border:1px solid var(--border);border-radius:15px;
+}
+.task.done{opacity:.65}
+.task.done .task-title{text-decoration:line-through}
+.task-main{flex:1;min-width:0}
+.task-title{font-weight:bold;overflow-wrap:anywhere}
+.task-meta{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+.priority{display:inline-block;font-size:10px;border-radius:20px;padding:4px 7px;margin-top:7px}
+.priority.Alta{background:#512638;color:#ff9eaa}
+.priority.Media{background:#493a1d;color:#ffdc91}
+.priority.Baja{background:#173d3c;color:#83e5c4}
+.task-actions{display:flex;gap:5px;flex-wrap:wrap}
+.task-check{accent-color:var(--blue);width:18px;height:18px;margin-top:2px}
+.empty{text-align:center;padding:28px;color:var(--muted);border:1px dashed var(--border);border-radius:14px}
+.progress-track{height:10px;background:#071126;border-radius:20px;overflow:hidden;margin:10px 0 18px}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .3s}
+.timer{text-align:center;padding:18px 0}
+.timer-number{font-size:clamp(54px,10vw,86px);font-weight:bold;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.timer-ring{
+  width:min(280px,75vw);height:min(280px,75vw);margin:10px auto 22px;
+  border-radius:50%;border:7px solid #203c68;outline:1px solid #31558c;
+  display:grid;place-items:center;background:radial-gradient(circle,#14294e,#09152d);
+}
+.timer-ring.running{border-color:var(--cyan);box-shadow:0 0 30px #55d6f525}
+.notice{font-size:12px;line-height:1.6;padding:12px;border:1px solid #66512a;background:#2c261a;color:#ffe0a0;border-radius:12px;margin:12px 0}
+.setting-row{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:13px 0;border-bottom:1px solid var(--border)}
+.setting-row p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+
+/* A.N.D.E.R.: opciones de preguntas */
+.ai-options{display:grid;gap:11px;margin-top:15px}
+.ai-option{
+  width:100%;display:flex;align-items:center;gap:12px;padding:15px;
+  text-align:left;color:var(--text);
+  background:linear-gradient(120deg,#14294b,#0b1933);
+  border:1px solid var(--border);border-radius:15px;
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.ai-option:hover{background:#1a3560;border-color:var(--blue);transform:translateY(-2px)}
+.ai-option:disabled{opacity:.55;cursor:wait;transform:none}
+.option-icon{
+  display:grid;place-items:center;flex-shrink:0;width:42px;height:42px;
+  border-radius:13px;color:var(--cyan);background:#1b3c68;font-size:22px;
+}
+.ai-option strong{display:block;font-size:13px;line-height:1.5}
+.ai-option small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.5}
+.ai-option>span:nth-child(2){flex:1}
+.thinking-note{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}
+.chat-box{display:flex;flex-direction:column;gap:12px;min-height:100px;max-height:350px;overflow:auto;margin:18px 0}
+.bubble{max-width:88%;padding:13px 15px;border-radius:16px;line-height:1.6;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble.bot{background:#172c50;border:1px solid #29446d;align-self:flex-start}
+.bubble.user{background:#275ca0;align-self:flex-end}
+.bubble.thinking{color:var(--cyan);animation:pulseThinking 1s ease-in-out infinite alternate}
+@keyframes pulseThinking{from{opacity:.45}to{opacity:1}}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:#eaf5ff;color:#102344;padding:12px 18px;border-radius:12px;
+  font-size:13px;font-weight:bold;z-index:10;display:none;
+  max-width:90vw;box-shadow:0 8px 30px #0005;
+}
+footer{text-align:center;color:#7185a7;font-size:11px;padding:25px 0 5px}
+.mobile-nav{display:none}
+
+@media(max-width:760px){
+  .app{padding:14px 14px 90px}
+  .layout{display:block}
+  .sidebar{display:none}
+  .topbar{margin-bottom:15px}
+  .top-chip{font-size:10px;padding:8px}
+  .hero{padding:22px}
+  h2{font-size:23px}
+  .stats{gap:8px}
+  .stat{padding:12px}
+  .stat .number{font-size:22px}
+  .stat .label{font-size:10px}
+  .features{gap:9px}
+  .feature{padding:14px}
+  .panel{padding:16px}
+  .mobile-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:8;
+    background:#08142cf5;border-top:1px solid var(--border);
+    justify-content:space-around;padding:8px 3px max(8px,env(safe-area-inset-bottom));
+    backdrop-filter:blur(16px);
+  }
+  .mobile-nav .navbtn{
+    display:flex;flex-direction:column;gap:4px;align-items:center;
+    justify-content:center;font-size:10px;padding:7px 4px;margin:0;
+    width:20%;border-radius:10px;
+  }
+  .mobile-nav .nav-icon{font-size:18px}
+  .mobile-nav .navbtn.active{box-shadow:inset 0 2px var(--cyan)}
+}
+@media(max-width:420px){
+  .form-grid{grid-template-columns:1fr}
+  .stat .number{font-size:19px}
+  .task{gap:8px;padding:12px}
+  .task-actions .btn{padding:6px 8px}
+  .ai-option{padding:12px;gap:9px}
+  .option-icon{width:36px;height:36px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">E</div>
+      <div><h1>ETE</h1><p>Tu tiempo, tu ritmo.</p></div>
+    </div>
+    <div class="top-chip">● TU ESPACIO DIGITAL</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div id="desktopNav"></div>
+      <div class="side-note">Organiza tus actividades, cuida tus pausas y usa la tecnología con intención.</div>
+    </aside>
+
+    <main>
+      <!-- INICIO -->
+      <section class="page active" id="home">
+        <div class="hero">
+          <div class="eyebrow">Tu centro de control</div>
+          <h2 id="greeting">Tu tiempo importa.</h2>
+          <p>Organiza tus tareas, avanza a tu ritmo y recuerda que descansar también forma parte del progreso.</p>
+          <button class="btn" onclick="showPage('agenda')">Organizar mi día ↗</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="label">Tareas pendientes</div><div class="number" id="homePending">0</div><div class="sub">Un paso a la vez</div></div>
+          <div class="stat"><div class="label">Completadas</div><div class="number" id="homeDone">0</div><div class="sub">Progreso real</div></div>
+          <div class="stat"><div class="label">Minutos de enfoque</div><div class="number" id="homeMinutes">0</div><div class="sub">Sesiones completas</div></div>
+        </div>
+
+        <div class="section-head"><h3>¿Qué necesitas hoy?</h3></div>
+        <div class="features">
+          <div class="feature" onclick="showPage('agenda')"><div class="symbol">▤</div><h3>Mi agenda</h3><p>Registra, busca y organiza tus actividades.</p></div>
+          <div class="feature" onclick="showPage('focus')"><div class="symbol">◷</div><h3>Modo enfoque</h3><p>Trabaja por intervalos y toma pausas.</p></div>
+          <div class="feature" onclick="showPage('progress')"><div class="symbol">↗</div><h3>Mi progreso</h3><p>Consulta tus tareas y sesiones completadas.</p></div>
+          <div class="feature" onclick="showPage('ander')"><div class="symbol">✧</div><h3>Hablar con A.N.D.E.R.</h3><p>Elige una pregunta y recibe consejos.</p></div>
+        </div>
+      </section>
+
+      <!-- AGENDA -->
+      <section class="page" id="agenda">
+        <div class="section-head"><h2>Mi agenda</h2><span class="muted" id="taskCount">0 tareas</span></div>
+
+        <div class="panel">
+          <h3>＋ Añadir actividad</h3>
+          <form id="taskForm">
+            <div class="field">
+              <label for="taskTitle">Nombre de la tarea</label>
+              <input id="taskTitle" maxlength="120" placeholder="Ej. Terminar el informe de ciencias" required>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="taskSubject">Curso o categoría</label>
+                <input id="taskSubject" maxlength="60" placeholder="Ej. Ciencia y Tecnología">
+              </div>
+              <div class="field">
+                <label for="taskDate">Fecha límite</label>
+                <input id="taskDate" type="date">
+              </div>
+              <div class="field">
+                <label for="taskPriority">Prioridad</label>
+                <select id="taskPriority"><option>Media</option><option>Alta</option><option>Baja</option></select>
+              </div>
+            </div>
+            <button class="btn" type="submit">Guardar tarea +</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="field">
+            <label for="taskSearch">Buscar por nombre o curso</label>
+            <input id="taskSearch" class="searchbox" placeholder="Escribe para buscar...">
+          </div>
+          <div class="row">
+            <select id="taskFilter" class="searchbox" style="flex:1">
+              <option value="all">Todas las tareas</option>
+              <option value="pending">Pendientes</option>
+              <option value="done">Completadas</option>
+              <option value="overdue">Vencidas</option>
+            </select>
+            <select id="taskSort" class="searchbox" style="flex:1">
+              <option value="date">Ordenar por fecha</option>
+              <option value="priority">Prioridad primero</option>
+              <option value="newest">Más recientes</option>
+            </select>
+          </div>
+          <div id="taskList" class="task-list"></div>
+          <div class="row" style="margin-top:15px">
+            <button class="btn secondary small" onclick="exportData()">Exportar copia</button>
+            <button class="btn secondary small" onclick="document.getElementById('importFile').click()">Importar copia</button>
+            <input id="importFile" type="file" accept=".json,application/json" hidden>
+            <button class="btn danger small" onclick="clearCompleted()">Borrar completadas</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROGRESO -->
+      <section class="page" id="progress">
+        <div class="section-head"><h2>Mi progreso</h2></div>
+        <div class="panel">
+          <h3>Resumen de tus actividades</h3>
+          <div class="stats">
+            <div class="stat"><div class="label">Total</div><div class="number" id="totalTasks">0</div></div>
+            <div class="stat"><div class="label">Completadas</div><div class="number" id="doneTasks">0</div></div>
+            <div class="stat"><div class="label">Pendientes</div><div class="number" id="pendingTasks">0</div></div>
+          </div>
+          <div class="row" style="justify-content:space-between"><span class="muted">Avance de tareas</span><strong id="progressPercent">0%</strong></div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          <p class="muted">Tu progreso no tiene que ser perfecto. Lo importante es avanzar de forma constante y mantener un equilibrio saludable.</p>
+        </div>
+        <div class="panel">
+          <h3>Tiempo de enfoque</h3>
+          <div class="stats">
+            <div class="stat"><div class="label">Minutos totales</div><div class="number" id="progressMinutes">0</div></div>
+            <div class="stat"><div class="label">Sesiones completas</div><div class="number" id="progressSessions">0</div></div>
+            <div class="stat"><div class="label">Horas aproximadas</div><div class="number" id="progressHours">0</div></div>
+          </div>
+          <button class="btn secondary" onclick="showPage('focus')">Iniciar una sesión</button>
+        </div>
+      </section>
+
+      <!-- TEMPORIZADOR -->
+      <section class="page" id="focus">
+        <div class="section-head"><h2>Modo enfoque</h2></div>
+        <div class="panel">
+          <div class="timer">
+            <div class="eyebrow" id="timerLabel">TIEMPO PARA CONCENTRARTE</div>
+            <div class="timer-ring" id="timerRing"><div class="timer-number" id="timerDisplay">25:00</div></div>
+            <div class="field" style="max-width:250px;margin:0 auto 18px">
+              <label for="focusLength">Duración de la sesión</label>
+              <select id="focusLength">
+                <option value="15">15 minutos</option>
+                <option value="25" selected>25 minutos</option>
+                <option value="30">30 minutos</option>
+                <option value="45">45 minutos</option>
+                <option value="60">60 minutos</option>
+              </select>
+            </div>
+            <div class="row" style="justify-content:center">
+              <button class="btn" id="timerStart">Iniciar</button>
+              <button class="btn secondary" id="timerPause" disabled>Pausar</button>
+              <button class="btn secondary" id="timerReset">Reiniciar</button>
+            </div>
+          </div>
+          <p class="muted" style="text-align:center">Silencia las distracciones que puedas controlar. Cuando termines, descansa un poco y mueve el cuerpo.</p>
+        </div>
+        <div class="panel">
+          <h3>Pequeño recordatorio</h3>
+          <p class="muted">Una sesión de enfoque es una herramienta, no una obligación. Ajusta el tiempo según tu tarea y descansa cuando lo necesites.</p>
+        </div>
+      </section>
+
+      <!-- A.N.D.E.R. -->
+      <section class="page" id="ander">
+        <div class="section-head">
+          <h2>A.N.D.E.R.</h2>
+          <span class="top-chip">ASISTENTE ETE</span>
+        </div>
+
+        <div class="panel">
+          <div class="eyebrow">Tu asistente personal</div>
+          <h3 style="margin-top:10px">¿Sobre qué quieres saber?</h3>
+          <p class="muted">Selecciona una pregunta para recibir consejos sobre tu tiempo y tus hábitos digitales.</p>
+
+          <div class="ai-options" id="aiOptions">
+            <button class="ai-option" onclick="askAnder('organizar')">
+              <span class="option-icon">▤</span>
+              <span><strong>¿Cómo puedo organizar mis tareas?</strong><small>Planifica mejor tu tiempo de estudio.</small></span>
+              <span>›</span>
+            </button>
+
+            <button class="ai-option" onclick="askAnder('pantallas')">
+              <span class="option-icon">◉</span>
+              <span><strong>¿Cómo puedo usar menos las pantallas?</strong><small>Mejora tus hábitos digitales.</small></span>
+              <span>›</span>
+            </button>
+
+            <button class="ai-option" onclick="askAnder('concentracion')">
+              <span class="option-icon">◎</span>
+              <span><strong>¿Cómo puedo concentrarme mejor?</strong><small>Reduce las distracciones al estudiar.</small></span>
+              <span>›</span>
+            </button>
+
+            <button class="ai-option" onclick="askAnder('descanso')">
+              <span class="option-icon">☾</span>
+              <span><strong>¿Por qué son importantes los descansos?</strong><small>Equilibra el estudio y el bienestar.</small></span>
+              <span>›</span>
+            </button>
+
+            <button class="ai-option" onclick="askAnder('efectos')">
+              <span class="option-icon">↗</span>
+              <span><strong>¿Qué pasa si uso demasiado el celular?</strong><small>Conoce sus posibles efectos.</small></span>
+              <span>›</span>
+            </button>
+
+            <button class="ai-option" onclick="askAnder('rutina')">
+              <span class="option-icon">✧</span>
+              <span><strong>¿Cómo creo una rutina equilibrada?</strong><small>Combina estudio, ocio y descanso.</small></span>
+              <span>›</span>
+            </button>
+          </div>
+
+          <div class="chat-box" id="chatBox" aria-live="polite">
+            <div class="bubble bot">Hola, soy A.N.D.E.R. Elige una de las opciones para comenzar.</div>
+          </div>
+
+          <div class="row" style="justify-content:space-between">
+            <span class="thinking-note">A.N.D.E.R. · Tu tiempo, tu ritmo</span>
+            <button class="btn secondary small" onclick="resetChat()">Reiniciar conversación</button>
+          </div>
+
+          <div class="notice">Esta versión utiliza respuestas preparadas y una espera simulada. Para conversar con una inteligencia artificial real se necesita conectar un servicio de IA.</div>
+        </div>
+      </section>
+
+      <!-- PERSONALIZACIÓN -->
+      <section class="page" id="settings">
+        <div class="section-head"><h2>Personalización</h2></div>
+        <div class="panel">
+          <h3>Tu espacio</h3>
+          <div class="field">
+            <label for="userName">¿Cómo quieres que te llamemos?</label>
+            <input id="userName" maxlength="40" placeholder="Tu nombre o apodo">
+          </div>
+          <div class="field">
+            <label for="userGoal">Mi objetivo principal</label>
+            <select id="userGoal">
+              <option>Organizar mis tareas</option>
+              <option>Reducir distracciones</option>
+              <option>Mejorar mi concentración</option>
+              <option>Equilibrar estudio y descanso</option>
+            </select>
+          </div>
+          <button class="btn" onclick="saveSettings()">Guardar preferencias</button>
+        </div>
+        <div class="panel">
+          <h3>Datos y privacidad</h3>
+          <p class="muted">Tus tareas y preferencias se guardan en este navegador. No se sincronizan automáticamente entre dispositivos y podrían perderse si borras sus datos.</p>
+          <div class="row">
+            <button class="btn secondary" onclick="exportData()">Descargar copia de seguridad</button>
+            <button class="btn danger" onclick="resetAll()">Borrar todos mis datos</button>
+          </div>
+          <div class="notice">El inicio de sesión con Google todavía no está conectado. No introduzcas contraseñas en esta versión.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>ETE · Tu tiempo, tu ritmo · Versión de demostración</footer>
+</div>
+
+<nav class="mobile-nav" id="mobileNav"></nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const NAV = [
+  {id:"home",icon:"⌂",label:"Inicio"},
+  {id:"agenda",icon:"▤",label:"Agenda"},
+  {id:"focus",icon:"◷",label:"Enfoque"},
+  {id:"progress",icon:"↗",label:"Progreso"},
+  {id:"ander",icon:"✧",label:"A.N.D.E.R."}
+];
+
+function readStore(key,fallback){
+  try{
+    const value=localStorage.getItem(key);
+    return value===null?fallback:JSON.parse(value);
+  }catch(e){return fallback}
+}
+
+let tasks=readStore("ete_tasks_v2",[]);
+let settings=readStore("ete_settings_v2",{name:"",goal:"Organizar mis tareas"});
+let focusStats=readStore("ete_focus_v2",{minutes:0,sessions:0});
+let toastTimeout;
+
+function saveAll(){
+  localStorage.setItem("ete_tasks_v2",JSON.stringify(tasks));
+  localStorage.setItem("ete_settings_v2",JSON.stringify(settings));
+  localStorage.setItem("ete_focus_v2",JSON.stringify(focusStats));
+}
+
+function notify(message){
+  const el=$("toast");
+  el.textContent=message;
+  el.style.display="block";
+  clearTimeout(toastTimeout);
+  toastTimeout=setTimeout(()=>el.style.display="none",2600);
+}
+
+function escapeHTML(value){
+  return String(value??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(id==="agenda")renderTasks();
+  if(id==="progress")renderStats();
+}
+
+function buildNav(){
+  const html=NAV.map(n=>
+    `<button class="navbtn ${n.id==="home"?"active":""}" data-page="${n.id}" onclick="showPage('${n.id}')">
+      <span class="nav-icon">${n.icon}</span><span>${n.label}</span>
+    </button>`
+  ).join("");
+  $("desktopNav").innerHTML=html;
+  $("mobileNav").innerHTML=html;
+}
+
+function localDateString(date=new Date()){
+  const d=new Date(date.getTime()-date.getTimezoneOffset()*60000);
+  return d.toISOString().slice(0,10);
+}
+
+function dateLabel(value){
+  if(!value)return "Sin fecha límite";
+  return new Date(value+"T12:00:00").toLocaleDateString("es-PE",{
+    day:"numeric",month:"short",year:"numeric"
+  });
+}
+
+function isOverdue(task){
+  return !task.done&&!!task.date&&task.date<localDateString();
+}
+
+function renderTasks(){
+  const query=$("taskSearch").value.trim().toLowerCase();
+  const filter=$("taskFilter").value;
+  const sort=$("taskSort").value;
+
+  let list=tasks.filter(t=>{
+    const matches=(t.title+" "+(t.subject||"")).toLowerCase().includes(query);
+    const matchesFilter=
+      filter==="all"||
+      (filter==="pending"&&!t.done)||
+      (filter==="done"&&t.done)||
+      (filter==="overdue"&&isOverdue(t));
+    return matches&&matchesFilter;
+  });
+
+  const rank={Alta:0,Media:1,Baja:2};
+
+  list.sort((a,b)=>{
+    if(sort==="priority"){
+      return rank[a.priority]-rank[b.priority]||
+        ((a.date||"9999").localeCompare(b.date||"9999"));
+    }
+    if(sort==="newest")return b.created-a.created;
+    return Number(a.done)-Number(b.done)||
+      (a.date||"9999").localeCompare(b.date||"9999")||
+      rank[a.priority]-rank[b.priority];
+  });
+
+  $("taskCount").textContent=tasks.length+" tarea"+(tasks.length===1?"":"s");
+
+  if(!list.length){
+    $("taskList").innerHTML='<div class="empty">No hay tareas que mostrar.<br>Prueba otra búsqueda o añade una actividad.</div>';
+    return;
+  }
+
+  $("taskList").innerHTML=list.map(t=>{
+    const overdue=isOverdue(t);
+    return `<article class="task ${t.done?"done":""}">
+      <input class="task-check" type="checkbox" aria-label="Completar tarea" ${t.done?"checked":""} onchange="toggleTask('${t.id}')">
+      <div class="task-main">
+        <div class="task-title">${escapeHTML(t.title)}</div>
+        <div class="task-meta">${escapeHTML(t.subject||"Sin categoría")} · ${escapeHTML(dateLabel(t.date))}${overdue?' · <span style="color:var(--red)">Vencida</span>':""}</div>
+        <span class="priority ${escapeHTML(t.priority)}">${escapeHTML(t.priority)}</span>
+      </div>
+      <div class="task-actions">
+        <button class="btn danger small" aria-label="Eliminar tarea" onclick="deleteTask('${t.id}')">×</button>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+$("taskForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const title=$("taskTitle").value.trim();
+  if(!title)return;
+
+  tasks.unshift({
+    id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),
+    title,
+    subject:$("taskSubject").value.trim(),
+    date:$("taskDate").value,
+    priority:$("taskPriority").value,
+    done:false,
+    created:Date.now()
+  });
+
+  saveAll();
+  $("taskForm").reset();
+  $("taskPriority").value="Media";
+  renderTasks();
+  renderStats();
+  notify("Tarea guardada");
+});
+
+["taskSearch","taskFilter","taskSort"].forEach(id=>{
+  $(id).addEventListener(id==="taskSearch"?"input":"change",renderTasks);
+});
+
+function toggleTask(id){
+  const task=tasks.find(t=>t.id===id);
+  if(!task)return;
+  task.done=!task.done;
+  saveAll();
+  renderTasks();
+  renderStats();
+  notify(task.done?"¡Tarea completada!":"Tarea pendiente");
+}
+
+function deleteTask(id){
+  const task=tasks.find(t=>t.id===id);
+  if(!task)return;
+  if(!confirm(`¿Eliminar la tarea "${task.title}"?`))return;
+  tasks=tasks.filter(t=>t.id!==id);
+  saveAll();
+  renderTasks();
+  renderStats();
+  notify("Tarea eliminada");
+}
+
+function clearCompleted(){
+  const count=tasks.filter(t=>t.done).length;
+  if(!count){notify("No hay tareas completadas");return}
+  if(!confirm(`¿Eliminar las ${count} tareas completadas? Esta acción no se puede deshacer.`))return;
+  tasks=tasks.filter(t=>!t.done);
+  saveAll();
+  renderTasks();
+  renderStats();
+  notify("Lista actualizada");
+}
+
+function renderStats(){
+  const done=tasks.filter(t=>t.done).length;
+  const pending=tasks.length-done;
+  const percent=tasks.length?Math.round(done/tasks.length*100):0;
+
+  $("homePending").textContent=pending;
+  $("homeDone").textContent=done;
+  $("homeMinutes").textContent=focusStats.minutes;
+  $("totalTasks").textContent=tasks.length;
+  $("doneTasks").textContent=done;
+  $("pendingTasks").textContent=pending;
+  $("progressPercent").textContent=percent+"%";
+  $("progressFill").style.width=percent+"%";
+  $("progressMinutes").textContent=focusStats.minutes;
+  $("progressSessions").textContent=focusStats.sessions;
+  $("progressHours").textContent=(focusStats.minutes/60).toFixed(1);
+}
+
+function exportData(){
+  const data={
+    app:"ETE",version:2,exportedAt:new Date().toISOString(),
+    tasks,settings,focusStats
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="ete-copia-seguridad.json";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  notify("Copia de seguridad descargada");
+}
+
+$("importFile").addEventListener("change",async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+
+  try{
+    const data=JSON.parse(await file.text());
+    if(!data||!Array.isArray(data.tasks)||!data.settings||!data.focusStats){
+      throw new Error("invalid");
+    }
+
+    if(!confirm("Importar esta copia reemplazará tus tareas, preferencias y estadísticas actuales. ¿Continuar?"))return;
+
+    tasks=data.tasks.filter(t=>t&&typeof t.title==="string").map(t=>({
+      id:String(t.id||Date.now()+Math.random()),
+      title:t.title.slice(0,120),
+      subject:String(t.subject||"").slice(0,60),
+      date:String(t.date||""),
+      priority:["Alta","Media","Baja"].includes(t.priority)?t.priority:"Media",
+      done:Boolean(t.done),
+      created:Number(t.created)||Date.now()
+    }));
+
+    settings={
+      name:String(data.settings.name||"").slice(0,40),
+      goal:String(data.settings.goal||"Organizar mis tareas")
+    };
+
+    focusStats={
+      minutes:Math.max(0,Number(data.focusStats.minutes)||0),
+      sessions:Math.max(0,Number(data.focusStats.sessions)||0)
+    };
+
+    saveAll();
+    loadSettings();
+    renderTasks();
+    renderStats();
+    notify("Copia restaurada");
+  }catch(err){
+    notify("Archivo no válido. Usa una copia de ETE.");
+  }finally{
+    e.target.value="";
+  }
+});
+
+function resetAll(){
+  if(!confirm("¿Borrar todas tus tareas, preferencias y estadísticas?"))return;
+  if(!confirm("Última confirmación: esta acción no se puede deshacer."))return;
+
+  tasks=[];
+  settings={name:"",goal:"Organizar mis tareas"};
+  focusStats={minutes:0,sessions:0};
+
+  saveAll();
+  loadSettings();
+  renderTasks();
+  renderStats();
+  resetChat();
+  notify("Datos borrados");
+}
+
+function loadSettings(){
+  $("userName").value=settings.name||"";
+  $("userGoal").value=settings.goal||"Organizar mis tareas";
+  $("greeting").textContent=settings.name?`¡Hola, ${settings.name}!`:"Tu tiempo importa.";
+}
+
+function saveSettings(){
+  settings.name=$("userName").value.trim();
+  settings.goal=$("userGoal").value;
+  saveAll();
+  loadSettings();
+  notify("Preferencias guardadas");
+}
+
+/* TEMPORIZADOR */
+let timerDuration=25*60;
+let timerRemaining=25*60;
+let timerEndAt=null;
+let timerInterval=null;
+let timerRunning=false;
+
+function displayTimer(){
+  const seconds=Math.max(0,Math.ceil(timerRemaining));
+  $("timerDisplay").textContent=
+    String(Math.floor(seconds/60)).padStart(2,"0")+":"+
+    String(seconds%60).padStart(2,"0");
+
+  $("timerRing").classList.toggle("running",timerRunning);
+  $("timerStart").disabled=timerRunning;
+  $("timerPause").disabled=!timerRunning;
+  $("focusLength").disabled=timerRunning;
+  $("timerLabel").textContent=timerRunning?"SESIÓN EN CURSO":"TIEMPO PARA CONCENTRARTE";
+}
+
+function stopTimer(){
+  clearInterval(timerInterval);
+  timerInterval=null;
+  timerRunning=false;
+  timerEndAt=null;
+}
+
+function tickTimer(){
+  if(!timerRunning)return;
+  timerRemaining=Math.max(0,(timerEndAt-Date.now())/1000);
+  displayTimer();
+
+  if(timerRemaining<=0){
+    stopTimer();
+    timerRemaining=0;
+    focusStats.minutes+=Math.round(timerDuration/60);
+    focusStats.sessions++;
+    saveAll();
+    renderStats();
+    displayTimer();
+    $("timerLabel").textContent="SESIÓN COMPLETADA";
+    notify("Sesión terminada. Tómate un descanso.");
+    alert("¡Sesión completada! Has terminado tu tiempo de enfoque. Tómate un descanso.");
+  }
+}
+
+$("focusLength").addEventListener("change",()=>{
+  timerDuration=Number($("focusLength").value)*60;
+  timerRemaining=timerDuration;
+  displayTimer();
+});
+
+$("timerStart").addEventListener("click",()=>{
+  if(timerRemaining<=0)timerRemaining=timerDuration;
+  timerRunning=true;
+  timerEndAt=Date.now()+timerRemaining*1000;
+  timerInterval=setInterval(tickTimer,250);
+  displayTimer();
+});
+
+$("timerPause").addEventListener("click",()=>{
+  if(!timerRunning)return;
+  timerRemaining=Math.max(0,(timerEndAt-Date.now())/1000);
+  stopTimer();
+  displayTimer();
+});
+
+$("timerReset").addEventListener("click",()=>{
+  stopTimer();
+  timerDuration=Number($("focusLength").value)*60;
+  timerRemaining=timerDuration;
+  displayTimer();
+});
+
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden&&timerRunning)tickTimer();
+});
+
+/* A.N.D.E.R.: preguntas predeterminadas y espera animada */
+const anderAnswers={
+  organizar:{
+    question:"¿Cómo puedo organizar mis tareas?",
+    answer:"Para organizarte mejor, anota tus tareas, ordénalas según su prioridad y divide las más grandes en pasos pequeños. Reserva un horario para estudiar y otro para descansar. Puedes registrar tus actividades en la agenda de ETE."
+  },
+  pantallas:{
+    question:"¿Cómo puedo usar menos las pantallas?",
+    answer:"Empieza identificando cuándo utilizas el celular sin una razón concreta. Establece momentos sin pantallas, desactiva las notificaciones innecesarias y dedica parte de tu tiempo libre a actividades fuera del dispositivo. Los cambios pequeños y constantes suelen ser más fáciles de mantener."
+  },
+  concentracion:{
+    question:"¿Cómo puedo concentrarme mejor?",
+    answer:"Antes de empezar, elige una tarea concreta. Silencia las notificaciones que no necesitas, prepara tus materiales y trabaja durante un tiempo que te resulte cómodo. Después, toma una pausa breve. Si te distraes, vuelve a la actividad sin castigarte por ello."
+  },
+  descanso:{
+    question:"¿Por qué son importantes los descansos?",
+    answer:"Los descansos permiten cambiar de actividad y recuperarte del esfuerzo mental. Puedes levantarte, estirarte, beber agua o conversar con alguien. Alternar trabajo y descanso puede ayudarte a mantener la atención y evitar que estudiar se convierta en una sesión interminable."
+  },
+  efectos:{
+    question:"¿Qué pasa si uso demasiado el celular?",
+    answer:"El uso excesivo o poco equilibrado puede interferir con el sueño, la concentración, las actividades escolares y el tiempo con otras personas. El efecto depende de cómo, cuándo y para qué utilizas el dispositivo. La meta no es dejar toda la tecnología, sino aprender a usarla de manera consciente."
+  },
+  rutina:{
+    question:"¿Cómo creo una rutina equilibrada?",
+    answer:"Empieza con tres bloques: responsabilidades, tiempo libre y descanso. Anota tus tareas importantes, reserva momentos para moverte y compartir con otras personas, y procura mantener un horario de sueño regular. Ajusta tu rutina según tus necesidades, sin intentar llenar cada minuto del día."
+  }
+};
+
+let anderThinking=false;
+let anderTimer=null;
+
+function askAnder(topic){
+  if(anderThinking)return;
+
+  const item=anderAnswers[topic];
+  if(!item)return;
+
+  anderThinking=true;
+  const buttons=document.querySelectorAll(".ai-option");
+  buttons.forEach(button=>button.disabled=true);
+
+  const box=$("chatBox");
+
+  const question=document.createElement("div");
+  question.className="bubble user";
+  question.textContent=item.question;
+  box.appendChild(question);
+
+  const thinking=document.createElement("div");
+  thinking.className="bubble bot thinking";
+  thinking.textContent="A.N.D.E.R. está pensando…";
+  box.appendChild(thinking);
+  box.scrollTop=box.scrollHeight;
+
+  anderTimer=setTimeout(()=>{
+    thinking.remove();
+
+    const answer=document.createElement("div");
+    answer.className="bubble bot";
+    answer.textContent=item.answer;
+    box.appendChild(answer);
+    box.scrollTop=box.scrollHeight;
+
+    buttons.forEach(button=>button.disabled=false);
+    anderThinking=false;
+    anderTimer=null;
+  },2200);
+}
+
+function resetChat(){
+  clearTimeout(anderTimer);
+  anderTimer=null;
+  anderThinking=false;
+
+  document.querySelectorAll(".ai-option").forEach(button=>button.disabled=false);
+
+  $("chatBox").innerHTML=
+    '<div class="bubble bot">Hola, soy A.N.D.E.R. Elige una de las opciones para comenzar.</div>';
+
+  notify("Conversación reiniciada");
+}
+
+/* INICIALIZACIÓN */
+buildNav();
+loadSettings();
+renderTasks();
+renderStats();
+displayTimer();
+</script>
+</body>
+</html>
